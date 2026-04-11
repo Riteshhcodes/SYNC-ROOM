@@ -1,0 +1,293 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base Reset ─────────────────────────────────────────── */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Noto Sans JP', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: rgba(20, 184, 166, 0.25);
+    color: #0f766e;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(20, 184, 166, 0.4);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(20, 184, 166, 0.6);
+  }
+}
+
+/* ─── Glassmorphism Components ───────────────────────────── */
+@layer components {
+  .glass-card {
+    @apply bg-glass backdrop-blur-xl rounded-xl border border-glass-border;
+    box-shadow: 0 8px 32px rgba(20, 184, 166, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+
+  .glass-card-hover:hover {
+    @apply bg-glass-hover border-glass-border-bright;
+    box-shadow: 0 8px 32px rgba(20, 184, 166, 0.1), 0 0 20px rgba(20, 184, 166, 0.05);
+  }
+
+  .anime-button {
+    @apply relative px-6 py-3 font-bold text-mint-primary border-2 border-mint-primary rounded-lg
+           transition-all duration-300 overflow-hidden bg-white/50 backdrop-blur-sm;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    box-shadow: 0 4px 15px rgba(20, 184, 166, 0.1);
+  }
+
+  .anime-button:hover {
+    background: rgba(20, 184, 166, 0.1);
+    box-shadow: 0 6px 20px rgba(20, 184, 166, 0.2), inset 0 0 10px rgba(20, 184, 166, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .anime-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(20, 184, 166, 0.1);
+  }
+
+  .anime-button-solid {
+    @apply relative px-6 py-3 font-bold rounded-lg text-white
+           transition-all duration-300 overflow-hidden;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+  }
+
+  .anime-button-solid:hover {
+    box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4), 0 0 30px rgba(20, 184, 166, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .anime-input {
+    @apply w-full px-4 py-3 bg-white/80 backdrop-blur-md border border-glass-border rounded-lg
+           text-text-primary placeholder-text-muted
+           transition-all duration-300 outline-none;
+    font-family: 'Montserrat', system-ui, sans-serif;
+  }
+
+  .anime-input:focus {
+    @apply border-mint-primary bg-white;
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.2), inset 0 2px 4px rgba(20, 184, 166, 0.05);
+  }
+
+  .anime-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    color: #0f766e;
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.8), 4px 4px 15px rgba(20, 184, 166, 0.3);
+    letter-spacing: 0.1em;
+  }
+}
+
+/* ─── Water Breathing Wave (Progress Bar) ────────────────── */
+.water-breathing-bar {
+  position: relative;
+  overflow: hidden;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  z-index: 1;
+}
+
+.water-breathing-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #2dd4bf, #0891b2);
+  border-radius: 9999px;
+  transition: width 0.3s ease-out;
+  overflow: hidden;
+}
+
+.water-breathing-fill::before,
+.water-breathing-fill::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 40%;
+  animation: waveAnim 3s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+.water-breathing-fill::after {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 45%;
+  animation: waveAnim 5s linear infinite;
+}
+
+@keyframes waveAnim {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ─── Ripple Effect ──────────────────────────────────────── */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(20, 184, 166, 0.3);
+  transform: scale(0);
+  animation: rippleAnim 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes rippleAnim {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ─── Background Patterns ────────────────────────────────── */
+.bg-tanjiro {
+  background-color: #f0fdfa;
+  background-image:
+    linear-gradient(45deg, rgba(20, 184, 166, 0.05) 25%, transparent 25%, transparent 75%, rgba(20, 184, 166, 0.05) 75%, rgba(20, 184, 166, 0.05)),
+    linear-gradient(45deg, rgba(20, 184, 166, 0.05) 25%, transparent 25%, transparent 75%, rgba(20, 184, 166, 0.05) 75%, rgba(20, 184, 166, 0.05));
+  background-size: 60px 60px;
+  background-position: 0 0, 30px 30px;
+}
+
+/* ─── Drop Zone ─────────────────────────────────────── */
+.drop-zone {
+  @apply border-2 border-dashed border-mint-subtle rounded-xl
+         transition-all duration-300 bg-white/40;
+}
+
+.drop-zone.drag-over {
+  @apply border-mint-primary bg-mint-subtle/50;
+  box-shadow: inset 0 0 20px rgba(20, 184, 166, 0.1), 0 0 20px rgba(20, 184, 166, 0.1);
+}
+
+/* ─── Toast Overrides ────────────────────────────────────── */
+[data-sonner-toaster] {
+  --normal-bg: rgba(255, 255, 255, 0.95) !important;
+  --normal-border: rgba(20, 184, 166, 0.2) !important;
+  --normal-text: #1e293b !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ─── Mobile Optimizations ───────────────────────────────── */
+@media (max-width: 768px) {
+  .glass-card {
+    backdrop-filter: blur(10px);
+  }
+  
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ─── Demon Slayer Character Animations ──────────────────── */
+@keyframes breathingGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(20, 184, 166, 0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 20px rgba(20, 184, 166, 0.8)); transform: scale(1.02); }
+}
+
+@keyframes breathingGlowFlame {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.8)); transform: scale(1.02); }
+}
+
+.animate-breathing-water {
+  animation: breathingGlow 4s ease-in-out infinite;
+}
+
+.animate-breathing-flame {
+  animation: breathingGlowFlame 3s ease-in-out infinite;
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+.animate-float-subtle {
+  animation: floatSubtle 6s ease-in-out infinite;
+}
+
+/* Flame Particles */
+.flame-particle {
+  position: absolute;
+  background: radial-gradient(circle, #fcd34d 0%, #f97316 50%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: color-dodge;
+  animation: floatUpFlame 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes floatUpFlame {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-40px) scale(0); opacity: 0; }
+}
+
+/* Water Ripples */
+.water-ripple-aura {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0; left: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 20px rgba(14, 165, 233, 0.3);
+  animation: rippleExpand 3s linear infinite;
+  pointer-events: none;
+}
+.water-ripple-aura:nth-child(2) {
+  animation-delay: 1.5s;
+}
+
+@keyframes rippleExpand {
+  0% { transform: scale(0.8); opacity: 1; border: 2px solid rgba(56, 189, 248, 0.8); }
+  100% { transform: scale(1.5); opacity: 0; border: 2px solid rgba(14, 165, 233, 0); }
+}

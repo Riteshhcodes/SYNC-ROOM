@@ -1,0 +1,17 @@
+{
+  "name": "sync-room-server",
+  "version": "1.0.0",
+  "description": "SYNC_ROOM Backend — Socket.io signaling + Multer fallback",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.7.4",
+    "uuid": "^9.0.0"
+  }
+}
