@@ -12,6 +12,69 @@ import { HiOutlineQrcode, HiOutlineKey } from 'react-icons/hi';
 import { AnimeBackground, AnimeHeroes, HostRengokuIcon, JoinTanjiroIcon } from './AnimeCharacters';
 
 export default function Home() {
+  // Burn reveal effect and footer particles
+  useEffect(() => {
+    const initBurnReveal = async () => {
+      try {
+        const { triggerBurnReveal } = await import('./animations/burning-reveal.js');
+        
+        // Hide main content initially
+        const main = document.getElementById('main-content');
+        if (main) { 
+          main.style.opacity = '0'; 
+          main.style.transform = 'translateY(20px)'; 
+          main.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; 
+        }
+
+        triggerBurnReveal(() => {
+          // Reveal main content after fire burn
+          if (main) { 
+            main.style.opacity = '1'; 
+            main.style.transform = 'translateY(0)'; 
+          }
+        });
+      } catch (error) {
+        console.error('Failed to load burn reveal:', error);
+      }
+    };
+    
+    const initFooterParticles = () => {
+      const container = document.getElementById("footer-particle-container");
+      if (!container) return;
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < 100; i++) {
+        const span = document.createElement("span");
+        span.classList.add("footer-particle");
+        span.style.setProperty("--dim", `${3 + Math.random() * 6}rem`);
+        span.style.setProperty("--uplift", `${10 + Math.random() * 15}rem`);
+        span.style.setProperty("--pos-x", `${Math.random() * 100}%`);
+        span.style.setProperty("--dur", `${3 + Math.random() * 3}s`);
+        span.style.setProperty("--delay", `${-1 * (Math.random() * 10)}s`);
+        fragment.appendChild(span);
+      }
+      container.appendChild(fragment);
+    };
+
+    // Add footer CSS using a simpler approach
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      :root { --footer-color: #4CD9B0; }
+      .footer-section { position: relative; background: var(--footer-color); min-height: 250px; padding-bottom: 2rem; margin-top: 15rem; width: 100%; }
+      .gooey-animations { position: absolute; top: 0; width: 120%; left: -10%; height: 6rem; background: var(--footer-color); transform: translateY(-99%); z-index: 0; filter: url('#liquid-effect'); overflow: visible; pointer-events: none; }
+      .footer-particle { position: absolute; background: var(--footer-color); border-radius: 50%; top: 50%; left: var(--pos-x, 50%); width: var(--dim, 5rem); height: var(--dim, 5rem); transform: translate(-50%, -50%); animation: footer-float-up var(--dur, 4s) ease-in infinite; animation-delay: var(--delay, 0s); }
+      @keyframes footer-float-up { 0% { top: 50%; transform: translate(-50%, -50%) scale(1); } 100% { top: calc(var(--uplift) * -1); transform: translate(-50%, -50%) scale(0); } }
+      .footer-content { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center; }
+      .footer-brand { text-align: center; padding: 2rem 0 0; font-size: 1.4rem; font-weight: 800; color: #2E2E2E; letter-spacing: 2px; position: relative; z-index: 2; }
+      .footer-column { display: flex; flex-direction: column; gap: 1rem; }
+      .footer-column h4 { color: #2E2E2E; margin: 0; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+      .footer-column a { color: #2E2E2E; opacity: 0.8; text-decoration: none; font-size: 1rem; font-weight: 400; transition: opacity 0.3s, transform 0.3s; }
+      .footer-column a:hover { opacity: 1; transform: translateY(-3px); font-weight: 600; }
+    `;
+    document.head.appendChild(styleElement);
+    
+    initBurnReveal();
+    initFooterParticles();
+  }, []);
   const navigate = useNavigate();
   const { createRoom, joinRoom, roomId, connectionStatus, socketConnected } = useRoom();
 
@@ -131,13 +194,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-tanjiro flex flex-col items-center justify-center px-4 py-8 relative">
-      {/* Background Anime Illustration */}
+      <div id="hero-section" className="min-h-screen flex flex-col items-center justify-center w-full">
+        {/* Background Anime Illustration */}
       <img src="/anime_water_bg.png" alt="" className="fixed inset-0 w-full h-full object-cover opacity-40 mix-blend-multiply pointer-events-none z-0" />
       <div className="fixed inset-0 w-full h-full bg-gradient-to-b from-transparent to-white/50 pointer-events-none z-0" />
       <AnimeBackground />
       <AnimeHeroes />
 
-      <div className="relative z-10 flex flex-col items-center w-full">
+      <div id="main-content" className="relative z-10 flex flex-col items-center w-full">
         {/* Logo */}
         <motion.div
           className="mb-12 relative"
@@ -347,17 +411,54 @@ export default function Home() {
       </AnimatePresence>
 
       {/* Footer */}
-      <motion.div
-        className="relative z-10 mt-12 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
-        <p className="text-xs font-japanese font-medium text-text-secondary drop-shadow-sm">
-          E2E Encrypted • WebRTC P2P • Total Concentration
-        </p>
-      </motion.div>
+        <motion.div
+          className="relative z-10 mt-12 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          <p className="text-xs font-japanese font-medium text-text-secondary drop-shadow-sm">
+            E2E Encrypted • WebRTC P2P • Total Concentration
+          </p>
+        </motion.div>
       </div>
+      </div>
+
+      {/* Gooey Footer */}
+      <footer className="footer-section">
+        <div className="gooey-animations" id="footer-particle-container"></div>
+        <p className="footer-brand">壱 SYNC_ROOM 弐</p>
+        <div className="footer-content">
+          <div className="footer-column">
+            <h4>Product</h4>
+            <a href="#">How it Works</a>
+            <a href="#">Security</a>
+            <a href="#">Open Source</a>
+          </div>
+          <div className="footer-column">
+            <h4>Connect</h4>
+            <a href="#">GitHub</a>
+            <a href="#">Twitter / X</a>
+            <a href="#">Discord</a>
+          </div>
+          <div className="footer-column">
+            <h4>Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookies</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* SVG filter — REQUIRED for gooey effect */}
+      <svg style={{position:'absolute',width:0,height:0,overflow:'hidden'}} xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="liquid-effect">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="liquid" />
+          </filter>
+        </defs>
+      </svg>
     </div>
   );
 }

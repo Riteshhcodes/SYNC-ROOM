@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile optimizations for animated components */
+@media (max-width: 768px) {
+  #neural-network-canvas {
+    display: none !important;
+  }
+}
+
 /* ─── Base Reset ─────────────────────────────────────────── */
 @layer base {
   * {
