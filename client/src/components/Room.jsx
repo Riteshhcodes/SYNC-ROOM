@@ -28,7 +28,7 @@ export default function Room() {
           }
 
           // DOM is ready, now load animations
-          import('./animations/spider.js').then(({ initSpider, stopSpider }) => {
+          import('../utils/spiderController.js').then(({ initSpider, stopSpider }) => {
             initSpider();
             window._spiderControls = { initSpider, stopSpider };
           }).catch(error => {

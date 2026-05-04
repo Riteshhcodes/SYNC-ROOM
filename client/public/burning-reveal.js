@@ -98,7 +98,7 @@ function resizeCanvas(canvasEl, gl) {
   gl.uniform2f(uniforms.u_resolution, canvasEl.width, canvasEl.height);
 }
 
-export function triggerBurnReveal(onComplete) {
+function triggerBurnReveal(onComplete) {
   const canvasEl = document.getElementById("fire-overlay");
   if (!canvasEl) { return; }
 
@@ -140,3 +140,6 @@ export function triggerBurnReveal(onComplete) {
 
   rafId = requestAnimationFrame(render);
 }
+
+// Make function available globally for script loading
+window.__triggerBurnReveal = triggerBurnReveal;

@@ -40,7 +40,7 @@ export default function Home() {
             }
 
             // DOM is ready, now load and trigger animation
-            import('./animations/burning-reveal.js').then(({ triggerBurnReveal }) => {
+            import('../utils/burnRevealController.js').then(({ triggerBurnReveal }) => {
               // Hide main content initially
               main.style.opacity = '0'; 
               main.style.transform = 'translateY(20px)'; 

@@ -4,16 +4,21 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    force: true,
-    include: ['react', 'react-dom', 'react-router-dom', 'framer-motion', 'sonner']
-  },
-  server: {
-    port: 3005,
-    host: true,
+    exclude: ['spider-bundle', 'burning-reveal']
   },
   build: {
     outDir: 'dist',
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      external: [],
+    },
+    commonjsOptions: {
+      ignore: ['spider-bundle.js', 'burning-reveal.js']
+    }
+  },
+  server: {
+    port: 3005,
+    host: true,
   },
 });
