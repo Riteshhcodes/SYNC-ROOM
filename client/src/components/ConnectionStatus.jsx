@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CONNECTION_STATES } from '../utils/constants';
-import { useRoom } from '../context/RoomContext';
 
 const stateConfig = {
   [CONNECTION_STATES.WAITING]: {
@@ -46,17 +45,12 @@ const stateConfig = {
   },
 };
 
-export default function ConnectionStatus({ status, isP2P }) {
-  const { roomId, createRoom, joinRoom } = useRoom();
+export default function ConnectionStatus({ status, isP2P, onRetry }) {
   const config = stateConfig[status] || stateConfig[CONNECTION_STATES.WAITING];
 
   const handleRetry = () => {
-    if (roomId) {
-      // If we have a room ID, try to rejoin
-      joinRoom(roomId);
-    } else {
-      // Otherwise, create a new room
-      createRoom();
+    if (onRetry) {
+      onRetry();
     }
   };
 

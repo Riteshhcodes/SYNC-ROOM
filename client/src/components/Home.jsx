@@ -14,6 +14,7 @@ import { AnimeBackground, AnimeHeroes, HostRengokuIcon, JoinTanjiroIcon } from '
 
 export default function Home() {
   const { socket } = useSocket();
+  const { roomId, createRoom, joinRoom } = useRoom();
   
   // Prioritize connection establishment first
   useEffect(() => {
@@ -110,7 +111,7 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
   const navigate = useNavigate();
-  const { createRoom, joinRoom, roomId, connectionStatus, socketConnected } = useRoom();
+  const { connectionStatus, socketConnected } = useRoom();
 
   const [mode, setMode] = useState(null); // 'host' | 'join'
   const [joinId, setJoinId] = useState('');
@@ -226,6 +227,16 @@ export default function Home() {
     }
   }, [roomId]);
 
+  const handleRetry = useCallback(() => {
+    if (roomId) {
+      // If we have a room ID, try to rejoin
+      joinRoom(roomId);
+    } else {
+      // Otherwise, create a new room
+      createRoom();
+    }
+  }, [roomId, joinRoom, createRoom]);
+
   return (
     <div className="min-h-screen bg-tanjiro flex flex-col items-center justify-center px-4 py-8 relative">
       <div id="hero-section" className="min-h-screen flex flex-col items-center justify-center w-full">
@@ -315,7 +326,7 @@ export default function Home() {
             exit={{ opacity: 0, y: -20 }}
             className="flex flex-col items-center gap-6 w-full max-w-md"
           >
-            <ConnectionStatus status={connectionStatus} isP2P={false} />
+            <ConnectionStatus status={connectionStatus} isP2P={false} onRetry={handleRetry} />
 
             <QRDisplay value={generateRoomUrl(roomId)} size={220} />
 

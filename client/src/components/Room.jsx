@@ -141,6 +141,16 @@ export default function Room() {
   const isHost = role === 'host';
   const isConnected = connectionStatus === CONNECTION_STATES.CONNECTED;
 
+  const handleRetry = useCallback(() => {
+    if (roomId) {
+      // If we have a room ID, try to rejoin
+      joinRoom(roomId);
+    } else {
+      // Otherwise, create a new room
+      createRoom();
+    }
+  }, [roomId, joinRoom, createRoom]);
+
   return (
     <div className="min-h-screen bg-tanjiro relative">
       {/* Background Canvases */}
@@ -201,7 +211,7 @@ export default function Room() {
           animate={{ opacity: 1 }}
           className="flex justify-center"
         >
-          <ConnectionStatus status={connectionStatus} isP2P={isP2P} />
+          <ConnectionStatus status={connectionStatus} isP2P={isP2P} onRetry={handleRetry} />
         </motion.div>
 
         {/* Transfer Mode Info */}
