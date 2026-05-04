@@ -4,38 +4,6 @@
 let spiderStarted = false;
 let spiderCanvas = null;
 
-export function initSpider() {
-  if (spiderStarted) return;
-  
-  spiderCanvas = document.getElementById('spider-canvas');
-  if (!spiderCanvas) return;
-  spiderCanvas.style.opacity = '1';
-  spiderStarted = true;
-
-  // Redirect canvas selection to #spider-canvas
-  const origGetById = document.getElementById.bind(document);
-  document.getElementById = function(id) {
-    if (id === 'web') return spiderCanvas;
-    return origGetById(id);
-  };
-
-  // Run the spider bundle
-  runSpiderBundle();
-
-  // Restore original getElementById after a delay to ensure spider initializes
-  setTimeout(() => {
-    document.getElementById = origGetById;
-  }, 100);
-}
-
-export function stopSpider() {
-  if (!spiderCanvas) spiderCanvas = document.getElementById('spider-canvas');
-  if (spiderCanvas) {
-    spiderCanvas.style.transition = 'opacity 0.8s ease';
-    spiderCanvas.style.opacity = '0';
-  }
-}
-
 function runSpiderBundle() {
 !(function (e, t, n) {
 function i(n, s) {
@@ -541,4 +509,36 @@ return i;
 {},
 [1, 5]
 );
+}
+
+export function initSpider() {
+  if (spiderStarted) return;
+  
+  spiderCanvas = document.getElementById('spider-canvas');
+  if (!spiderCanvas) return;
+  spiderCanvas.style.opacity = '1';
+  spiderStarted = true;
+
+  // Redirect canvas selection to #spider-canvas
+  const origGetById = document.getElementById.bind(document);
+  document.getElementById = function(id) {
+    if (id === 'web') return spiderCanvas;
+    return origGetById(id);
+  };
+
+  // Run the spider bundle
+  runSpiderBundle();
+
+  // Restore original getElementById after a delay to ensure spider initializes
+  setTimeout(() => {
+    document.getElementById = origGetById;
+  }, 100);
+}
+
+export function stopSpider() {
+  if (!spiderStarted) return;
+  spiderStarted = false;
+  if (spiderCanvas) {
+    spiderCanvas.style.opacity = '0';
+  }
 }
