@@ -3,19 +3,19 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  optimizeDeps: {
-    exclude: ['spider-bundle', 'burning-reveal']
-  },
   build: {
-    outDir: 'dist',
-    sourcemap: false,
-    chunkSizeWarningLimit: 1500,
+    minify: 'esbuild',
     rollupOptions: {
-      external: [],
-    },
-    commonjsOptions: {
-      ignore: ['spider-bundle.js', 'burning-reveal.js']
+      output: {
+        manualChunks: undefined,
+      }
     }
+  },
+  esbuild: {
+    keepNames: true,
+  },
+  optimizeDeps: {
+    force: true
   },
   server: {
     port: 3005,
