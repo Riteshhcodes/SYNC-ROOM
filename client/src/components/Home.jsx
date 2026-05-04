@@ -7,6 +7,7 @@ import AnimeLogo from './AnimeLogo';
 import QRDisplay from './QRDisplay';
 import ConnectionStatus from './ConnectionStatus';
 import { useRoom } from '../context/RoomContext';
+import { useSocket } from '../hooks/useSocket';
 import { generateRoomUrl, CONNECTION_STATES } from '../utils/constants';
 import { HiOutlineQrcode, HiOutlineKey } from 'react-icons/hi';
 import { AnimeBackground, AnimeHeroes, HostRengokuIcon, JoinTanjiroIcon } from './AnimeCharacters';
@@ -45,20 +46,20 @@ export default function Home() {
               main.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; 
 
               triggerBurnReveal(() => {
-                // Reveal main content after fire burn
-                main.style.opacity = '1'; 
-                main.style.transform = 'translateY(0)'; 
-              });
-            }).catch(error => {
-              console.error('Failed to load burn reveal:', error);
+              // Reveal main content after fire burn
+              main.style.opacity = '1'; 
+              main.style.transform = 'translateY(0)'; 
             });
-          };
-          
-          checkDOM();
-        } catch (error) {
-          console.error('Failed to load burn reveal:', error);
-        }
-      };
+          }).catch(error => {
+            // Silently handle burn reveal loading errors
+          });
+        };
+        
+        checkDOM();
+      } catch (error) {
+        // Silently handle burn reveal initialization errors
+      }
+    };
       
       const initFooterParticles = () => {
         const container = document.getElementById("footer-particle-container");

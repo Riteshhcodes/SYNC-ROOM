@@ -32,19 +32,19 @@ export default function Room() {
             initSpider();
             window._spiderControls = { initSpider, stopSpider };
           }).catch(error => {
-            console.error('Failed to load spider controller:', error);
+            // Silently handle animation loading errors
           });
 
           import('./animations/neural-network.js').then(({ initNeuralNetwork, stopNeuralNetwork }) => {
             window._neuralControls = { initNeuralNetwork, stopNeuralNetwork };
           }).catch(error => {
-            console.error('Failed to load neural network controller:', error);
+            // Silently handle animation loading errors
           });
         };
         
         checkDOM();
       } catch (error) {
-        console.error('Failed to initialize animations:', error);
+        // Silently handle animation initialization errors
       }
     };
     

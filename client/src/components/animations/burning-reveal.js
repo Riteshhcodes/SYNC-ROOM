@@ -39,14 +39,13 @@ function initShader(canvasEl) {
   const vsSource = document.getElementById("vertShader").innerHTML;
   const fsSource = document.getElementById("fragShader").innerHTML;
   const gl = canvasEl.getContext("webgl") || canvasEl.getContext("experimental-webgl");
-  if (!gl) { console.error("WebGL not supported"); return null; }
+  if (!gl) { return null; }
 
   function createShader(gl, sourceCode, type) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error("Shader compile error: " + gl.getShaderInfoLog(shader));
       gl.deleteShader(shader);
       return null;
     }
@@ -62,7 +61,6 @@ function initShader(canvasEl) {
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error("Shader link error: " + gl.getProgramInfoLog(program));
     return null;
   }
 
@@ -102,7 +100,7 @@ function resizeCanvas(canvasEl, gl) {
 
 export function triggerBurnReveal(onComplete) {
   const canvasEl = document.getElementById("fire-overlay");
-  if (!canvasEl) { console.error("No #fire-overlay canvas found"); return; }
+  if (!canvasEl) { return; }
 
   const gl = initShader(canvasEl);
   if (!gl) return;
