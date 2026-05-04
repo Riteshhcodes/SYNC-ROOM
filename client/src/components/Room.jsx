@@ -13,75 +13,6 @@ import { HiOutlineLogout, HiOutlineClipboardCopy, HiOutlineKey } from 'react-ico
 import { toast } from 'sonner';
 
 export default function Room() {
-  // Spider and Neural Network animations
-  useEffect(() => {
-    const initAnimations = async () => {
-      try {
-        // Wait for DOM to be ready
-        const checkDOM = () => {
-          const spiderCanvas = document.getElementById('spider-canvas');
-          const neuralCanvas = document.getElementById('neural-network-canvas');
-          
-          if (!spiderCanvas || !neuralCanvas) {
-            setTimeout(checkDOM, 100);
-            return;
-          }
-
-          // DOM is ready, now load animations
-          import('../utils/spiderController.js').then(({ initSpider, stopSpider }) => {
-            initSpider();
-            window._spiderControls = { initSpider, stopSpider };
-          }).catch(error => {
-            // Silently handle animation loading errors
-          });
-
-          import('./animations/neural-network.js').then(({ initNeuralNetwork, stopNeuralNetwork }) => {
-            window._neuralControls = { initNeuralNetwork, stopNeuralNetwork };
-          }).catch(error => {
-            // Silently handle animation loading errors
-          });
-        };
-        
-        checkDOM();
-      } catch (error) {
-        // Silently handle animation initialization errors
-      }
-    };
-    
-    initAnimations();
-    
-    // Cleanup on unmount
-    return () => {
-      if (window._spiderControls) {
-        window._spiderControls.stopSpider();
-      }
-      if (window._neuralControls) {
-        window._neuralControls.stopNeuralNetwork();
-      }
-    };
-  }, []);
-
-  // Handle connection state changes
-  useEffect(() => {
-    const handleConnectionChange = async () => {
-      if (!window._spiderControls || !window._neuralControls) return;
-      
-      const { initSpider, stopSpider } = window._spiderControls;
-      const { initNeuralNetwork, stopNeuralNetwork } = window._neuralControls;
-      
-      if (isConnected) {
-        // When peer connects
-        stopSpider();
-        setTimeout(() => initNeuralNetwork(), 800);
-      } else {
-        // When peer disconnects
-        stopNeuralNetwork();
-        setTimeout(() => initSpider(), 400);
-      }
-    };
-    
-    handleConnectionChange();
-  }, [isConnected]);
   const { roomId: urlRoomId } = useParams();
   const navigate = useNavigate();
   const {
@@ -141,22 +72,8 @@ export default function Room() {
   const isHost = role === 'host';
   const isConnected = connectionStatus === CONNECTION_STATES.CONNECTED;
 
-  const handleRetry = useCallback(() => {
-    if (roomId) {
-      // If we have a room ID, try to rejoin
-      joinRoom(roomId);
-    } else {
-      // Otherwise, create a new room
-      createRoom();
-    }
-  }, [roomId, joinRoom, createRoom]);
-
   return (
     <div className="min-h-screen bg-tanjiro relative">
-      {/* Background Canvases */}
-      <canvas id="spider-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0;transition:opacity 0.8s ease;pointer-events:none;"></canvas>
-      <canvas id="neural-network-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0;transition:opacity 1.2s ease;pointer-events:none;"></canvas>
-      
       {/* Background Anime Illustration */}
       <img src="/anime_flame_bg.png" alt="" className="fixed inset-0 w-full h-full object-cover opacity-30 mix-blend-multiply pointer-events-none z-0" />
       <div className="fixed inset-0 w-full h-full bg-gradient-to-t from-transparent to-white/70 pointer-events-none z-0" />
@@ -165,7 +82,7 @@ export default function Room() {
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 border-b border-white shadow-sm relative"
+        className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 border-b border-white shadow-sm"
       >
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="scale-75 origin-left -ml-2">
@@ -211,7 +128,7 @@ export default function Room() {
           animate={{ opacity: 1 }}
           className="flex justify-center"
         >
-          <ConnectionStatus status={connectionStatus} isP2P={isP2P} onRetry={handleRetry} />
+          <ConnectionStatus status={connectionStatus} isP2P={isP2P} />
         </motion.div>
 
         {/* Transfer Mode Info */}

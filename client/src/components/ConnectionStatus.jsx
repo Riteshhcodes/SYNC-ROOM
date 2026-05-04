@@ -45,14 +45,8 @@ const stateConfig = {
   },
 };
 
-export default function ConnectionStatus({ status, isP2P, onRetry }) {
+export default function ConnectionStatus({ status, isP2P }) {
   const config = stateConfig[status] || stateConfig[CONNECTION_STATES.WAITING];
-
-  const handleRetry = () => {
-    if (onRetry) {
-      onRetry();
-    }
-  };
 
   return (
     <AnimatePresence mode="wait">
@@ -88,17 +82,6 @@ export default function ConnectionStatus({ status, isP2P, onRetry }) {
           >
             {isP2P ? 'P2P 🗡️' : 'RELAY ✉️'}
           </motion.span>
-        )}
-
-        {status === CONNECTION_STATES.ERROR && (
-          <motion.button
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={handleRetry}
-            className="text-xs font-anime font-semibold px-2.5 py-1 rounded-md bg-white border border-crimson-primary/30 text-crimson-primary shadow-sm hover:bg-crimson-primary/10 transition-colors"
-          >
-            Retry 🔄
-          </motion.button>
         )}
       </motion.div>
     </AnimatePresence>
