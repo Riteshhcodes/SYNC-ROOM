@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CONNECTION_STATES } from '../utils/constants';
+import { useRoom } from '../context/RoomContext';
 
 const stateConfig = {
   [CONNECTION_STATES.WAITING]: {
@@ -46,7 +47,18 @@ const stateConfig = {
 };
 
 export default function ConnectionStatus({ status, isP2P }) {
+  const { roomId, createRoom, joinRoom } = useRoom();
   const config = stateConfig[status] || stateConfig[CONNECTION_STATES.WAITING];
+
+  const handleRetry = () => {
+    if (roomId) {
+      // If we have a room ID, try to rejoin
+      joinRoom(roomId);
+    } else {
+      // Otherwise, create a new room
+      createRoom();
+    }
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -82,6 +94,17 @@ export default function ConnectionStatus({ status, isP2P }) {
           >
             {isP2P ? 'P2P 🗡️' : 'RELAY ✉️'}
           </motion.span>
+        )}
+
+        {status === CONNECTION_STATES.ERROR && (
+          <motion.button
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={handleRetry}
+            className="text-xs font-anime font-semibold px-2.5 py-1 rounded-md bg-white border border-crimson-primary/30 text-crimson-primary shadow-sm hover:bg-crimson-primary/10 transition-colors"
+          >
+            Retry 🔄
+          </motion.button>
         )}
       </motion.div>
     </AnimatePresence>

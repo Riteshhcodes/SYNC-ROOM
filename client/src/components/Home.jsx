@@ -12,82 +12,101 @@ import { HiOutlineQrcode, HiOutlineKey } from 'react-icons/hi';
 import { AnimeBackground, AnimeHeroes, HostRengokuIcon, JoinTanjiroIcon } from './AnimeCharacters';
 
 export default function Home() {
-  // Burn reveal effect and footer particles
+  const { socket } = useSocket();
+  
+  // Prioritize connection establishment first
   useEffect(() => {
-    const initBurnReveal = async () => {
-      try {
-        // Wait for DOM to be ready
-        const checkDOM = () => {
-          const fireCanvas = document.getElementById('fire-overlay');
-          const main = document.getElementById('main-content');
-          
-          if (!fireCanvas || !main) {
-            setTimeout(checkDOM, 100);
-            return;
-          }
+    return () => {
+      // Cleanup socket on unmount
+      if (socket) socket.disconnect();
+    };
+  }, [socket]);
 
-          // DOM is ready, now load and trigger animation
-          import('./animations/burning-reveal.js').then(({ triggerBurnReveal }) => {
-            // Hide main content initially
-            main.style.opacity = '0'; 
-            main.style.transform = 'translateY(20px)'; 
-            main.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; 
+  // Load heavy animations after connection is established
+  useEffect(() => {
+    const initAnimations = () => {
+      const initBurnReveal = async () => {
+        try {
+          // Wait for DOM to be ready
+          const checkDOM = () => {
+            const fireCanvas = document.getElementById('fire-overlay');
+            const main = document.getElementById('main-content');
+            
+            if (!fireCanvas || !main) {
+              setTimeout(checkDOM, 100);
+              return;
+            }
 
-            triggerBurnReveal(() => {
-              // Reveal main content after fire burn
-              main.style.opacity = '1'; 
-              main.style.transform = 'translateY(0)'; 
+            // DOM is ready, now load and trigger animation
+            import('./animations/burning-reveal.js').then(({ triggerBurnReveal }) => {
+              // Hide main content initially
+              main.style.opacity = '0'; 
+              main.style.transform = 'translateY(20px)'; 
+              main.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; 
+
+              triggerBurnReveal(() => {
+                // Reveal main content after fire burn
+                main.style.opacity = '1'; 
+                main.style.transform = 'translateY(0)'; 
+              });
+            }).catch(error => {
+              console.error('Failed to load burn reveal:', error);
             });
-          }).catch(error => {
-            console.error('Failed to load burn reveal:', error);
-          });
-        };
-        
-        checkDOM();
-      } catch (error) {
-        console.error('Failed to load burn reveal:', error);
-      }
-    };
-    
-    const initFooterParticles = () => {
-      const container = document.getElementById("footer-particle-container");
-      if (!container) {
-        setTimeout(initFooterParticles, 100);
-        return;
-      }
-      const fragment = document.createDocumentFragment();
-      for (let i = 0; i < 100; i++) {
-        const span = document.createElement("span");
-        span.classList.add("footer-particle");
-        span.style.setProperty("--dim", `${3 + Math.random() * 6}rem`);
-        span.style.setProperty("--uplift", `${10 + Math.random() * 15}rem`);
-        span.style.setProperty("--pos-x", `${Math.random() * 100}%`);
-        span.style.setProperty("--dur", `${3 + Math.random() * 3}s`);
-        span.style.setProperty("--delay", `${-1 * (Math.random() * 10)}s`);
-        fragment.appendChild(span);
-      }
-      container.appendChild(fragment);
+          };
+          
+          checkDOM();
+        } catch (error) {
+          console.error('Failed to load burn reveal:', error);
+        }
+      };
+      
+      const initFooterParticles = () => {
+        const container = document.getElementById("footer-particle-container");
+        if (!container) {
+          setTimeout(initFooterParticles, 100);
+          return;
+        }
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < 100; i++) {
+          const span = document.createElement("span");
+          span.classList.add("footer-particle");
+          span.style.setProperty("--dim", `${3 + Math.random() * 6}rem`);
+          span.style.setProperty("--uplift", `${10 + Math.random() * 15}rem`);
+          span.style.setProperty("--pos-x", `${Math.random() * 100}%`);
+          span.style.setProperty("--dur", `${3 + Math.random() * 3}s`);
+          span.style.setProperty("--delay", `${-1 * (Math.random() * 10)}s`);
+          fragment.appendChild(span);
+        }
+        container.appendChild(fragment);
+      };
+
+      // Add footer CSS using a simpler approach
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        :root { --footer-color: #4CD9B0; }
+        .footer-section { position: relative; background: var(--footer-color); min-height: 250px; padding-bottom: 2rem; margin-top: 15rem; width: 100%; }
+        .gooey-animations { position: absolute; top: 0; width: 120%; left: -10%; height: 6rem; background: var(--footer-color); transform: translateY(-99%); z-index: 0; filter: url('#liquid-effect'); overflow: visible; pointer-events: none; }
+        .footer-particle { position: absolute; background: var(--footer-color); border-radius: 50%; top: 50%; left: var(--pos-x, 50%); width: var(--dim, 5rem); height: var(--dim, 5rem); transform: translate(-50%, -50%); animation: footer-float-up var(--dur, 4s) ease-in infinite; animation-delay: var(--delay, 0s); }
+        @keyframes footer-float-up { 0% { top: 50%; transform: translate(-50%, -50%) scale(1); } 100% { top: calc(var(--uplift) * -1); transform: translate(-50%, -50%) scale(0); } }
+        .footer-content { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center; }
+        .footer-brand { text-align: center; padding: 2rem 0 0; font-size: 1.4rem; font-weight: 800; color: #2E2E2E; letter-spacing: 2px; position: relative; z-index: 2; }
+        .footer-column { display: flex; flex-direction: column; gap: 1rem; }
+        .footer-column h4 { color: #2E2E2E; margin: 0; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-column a { color: #2E2E2E; opacity: 0.8; text-decoration: none; font-size: 1rem; font-weight: 400; transition: opacity 0.3s, transform 0.3s; }
+        .footer-column a:hover { opacity: 1; transform: translateY(-3px); font-weight: 600; }
+      `;
+      document.head.appendChild(styleElement);
+      
+      // Delay animation loading to prioritize connection
+      setTimeout(() => {
+        initBurnReveal();
+        initFooterParticles();
+      }, 1000);
     };
 
-    // Add footer CSS using a simpler approach
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-      :root { --footer-color: #4CD9B0; }
-      .footer-section { position: relative; background: var(--footer-color); min-height: 250px; padding-bottom: 2rem; margin-top: 15rem; width: 100%; }
-      .gooey-animations { position: absolute; top: 0; width: 120%; left: -10%; height: 6rem; background: var(--footer-color); transform: translateY(-99%); z-index: 0; filter: url('#liquid-effect'); overflow: visible; pointer-events: none; }
-      .footer-particle { position: absolute; background: var(--footer-color); border-radius: 50%; top: 50%; left: var(--pos-x, 50%); width: var(--dim, 5rem); height: var(--dim, 5rem); transform: translate(-50%, -50%); animation: footer-float-up var(--dur, 4s) ease-in infinite; animation-delay: var(--delay, 0s); }
-      @keyframes footer-float-up { 0% { top: 50%; transform: translate(-50%, -50%) scale(1); } 100% { top: calc(var(--uplift) * -1); transform: translate(-50%, -50%) scale(0); } }
-      .footer-content { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center; }
-      .footer-brand { text-align: center; padding: 2rem 0 0; font-size: 1.4rem; font-weight: 800; color: #2E2E2E; letter-spacing: 2px; position: relative; z-index: 2; }
-      .footer-column { display: flex; flex-direction: column; gap: 1rem; }
-      .footer-column h4 { color: #2E2E2E; margin: 0; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-      .footer-column a { color: #2E2E2E; opacity: 0.8; text-decoration: none; font-size: 1rem; font-weight: 400; transition: opacity 0.3s, transform 0.3s; }
-      .footer-column a:hover { opacity: 1; transform: translateY(-3px); font-weight: 600; }
-    `;
-    document.head.appendChild(styleElement);
-    
-    initBurnReveal();
-    initFooterParticles();
+    // Load animations after a short delay to ensure connection is established
+    const timer = setTimeout(initAnimations, 500);
+    return () => clearTimeout(timer);
   }, []);
   const navigate = useNavigate();
   const { createRoom, joinRoom, roomId, connectionStatus, socketConnected } = useRoom();

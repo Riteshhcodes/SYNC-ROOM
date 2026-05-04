@@ -29,7 +29,6 @@ export default function Room() {
 
           // DOM is ready, now load animations
           import('./animations/spider.js').then(({ initSpider, stopSpider }) => {
-            console.log('Initializing spider animation...');
             initSpider();
             window._spiderControls = { initSpider, stopSpider };
           }).catch(error => {
@@ -37,7 +36,6 @@ export default function Room() {
           });
 
           import('./animations/neural-network.js').then(({ initNeuralNetwork, stopNeuralNetwork }) => {
-            console.log('Neural network controller loaded');
             window._neuralControls = { initNeuralNetwork, stopNeuralNetwork };
           }).catch(error => {
             console.error('Failed to load neural network controller:', error);

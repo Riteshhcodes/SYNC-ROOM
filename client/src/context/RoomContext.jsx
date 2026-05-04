@@ -25,6 +25,7 @@ export function RoomProvider({ children }) {
 
   const dataChannelRef = useRef(null);
   const peerIdRef = useRef(null);
+  const connectionTimeoutRef = useRef(null);
 
   const socket = useSocket();
   const fileTransfer = useFileTransfer();
@@ -52,14 +53,16 @@ export function RoomProvider({ children }) {
 
   const onConnectionStateChange = useCallback((state) => {
     if (state === 'connected') {
+      clearConnectionTimeout();
       setConnectionStatus(CONNECTION_STATES.CONNECTED);
     } else if (state === 'disconnected' || state === 'failed') {
+      clearConnectionTimeout();
       setConnectionStatus(CONNECTION_STATES.DISCONNECTED);
       setIsP2P(false);
     } else if (state === 'connecting') {
       setConnectionStatus(CONNECTION_STATES.CONNECTING);
     }
-  }, []);
+  }, [clearConnectionTimeout]);
 
   const webrtc = useWebRTC({
     onDataChannel,
@@ -67,12 +70,30 @@ export function RoomProvider({ children }) {
     sendSignal: socket.sendSignal,
   });
 
+  // Clear connection timeout
+  const clearConnectionTimeout = useCallback(() => {
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current);
+      connectionTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Set connection timeout
+  const setConnectionTimeout = useCallback(() => {
+    clearConnectionTimeout();
+    connectionTimeoutRef.current = setTimeout(() => {
+      setConnectionStatus(CONNECTION_STATES.ERROR);
+      toast.error('Connection Failed - Please try again');
+    }, 10000); // 10 seconds timeout
+  }, [clearConnectionTimeout]);
+
   // Listen for socket events
   useEffect(() => {
     const handlePeerJoined = ({ peerId: newPeerId }) => {
       setPeerId(newPeerId);
       peerIdRef.current = newPeerId;
       setConnectionStatus(CONNECTION_STATES.CONNECTING);
+      setConnectionTimeout();
 
       // Host initiates WebRTC
       if (role === 'host') {
