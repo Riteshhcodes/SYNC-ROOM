@@ -17,17 +17,36 @@ export default function Room() {
   useEffect(() => {
     const initAnimations = async () => {
       try {
-        const { initSpider, stopSpider } = await import('./animations/spider.js');
-        const { initNeuralNetwork, stopNeuralNetwork } = await import('./animations/neural-network.js');
+        // Wait for DOM to be ready
+        const checkDOM = () => {
+          const spiderCanvas = document.getElementById('spider-canvas');
+          const neuralCanvas = document.getElementById('neural-network-canvas');
+          
+          if (!spiderCanvas || !neuralCanvas) {
+            setTimeout(checkDOM, 100);
+            return;
+          }
+
+          // DOM is ready, now load animations
+          import('./animations/spider.js').then(({ initSpider, stopSpider }) => {
+            console.log('Initializing spider animation...');
+            initSpider();
+            window._spiderControls = { initSpider, stopSpider };
+          }).catch(error => {
+            console.error('Failed to load spider controller:', error);
+          });
+
+          import('./animations/neural-network.js').then(({ initNeuralNetwork, stopNeuralNetwork }) => {
+            console.log('Neural network controller loaded');
+            window._neuralControls = { initNeuralNetwork, stopNeuralNetwork };
+          }).catch(error => {
+            console.error('Failed to load neural network controller:', error);
+          });
+        };
         
-        // On room page mount (waiting for peer)
-        initSpider();
-        
-        // Store references for cleanup
-        window._spiderControls = { initSpider, stopSpider };
-        window._neuralControls = { initNeuralNetwork, stopNeuralNetwork };
+        checkDOM();
       } catch (error) {
-        console.error('Failed to load animation controllers:', error);
+        console.error('Failed to initialize animations:', error);
       }
     };
     

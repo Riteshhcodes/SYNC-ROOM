@@ -16,23 +16,34 @@ export default function Home() {
   useEffect(() => {
     const initBurnReveal = async () => {
       try {
-        const { triggerBurnReveal } = await import('./animations/burning-reveal.js');
-        
-        // Hide main content initially
-        const main = document.getElementById('main-content');
-        if (main) { 
-          main.style.opacity = '0'; 
-          main.style.transform = 'translateY(20px)'; 
-          main.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; 
-        }
-
-        triggerBurnReveal(() => {
-          // Reveal main content after fire burn
-          if (main) { 
-            main.style.opacity = '1'; 
-            main.style.transform = 'translateY(0)'; 
+        // Wait for DOM to be ready
+        const checkDOM = () => {
+          const fireCanvas = document.getElementById('fire-overlay');
+          const main = document.getElementById('main-content');
+          
+          if (!fireCanvas || !main) {
+            setTimeout(checkDOM, 100);
+            return;
           }
-        });
+
+          // DOM is ready, now load and trigger animation
+          import('./animations/burning-reveal.js').then(({ triggerBurnReveal }) => {
+            // Hide main content initially
+            main.style.opacity = '0'; 
+            main.style.transform = 'translateY(20px)'; 
+            main.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; 
+
+            triggerBurnReveal(() => {
+              // Reveal main content after fire burn
+              main.style.opacity = '1'; 
+              main.style.transform = 'translateY(0)'; 
+            });
+          }).catch(error => {
+            console.error('Failed to load burn reveal:', error);
+          });
+        };
+        
+        checkDOM();
       } catch (error) {
         console.error('Failed to load burn reveal:', error);
       }
@@ -40,7 +51,10 @@ export default function Home() {
     
     const initFooterParticles = () => {
       const container = document.getElementById("footer-particle-container");
-      if (!container) return;
+      if (!container) {
+        setTimeout(initFooterParticles, 100);
+        return;
+      }
       const fragment = document.createDocumentFragment();
       for (let i = 0; i < 100; i++) {
         const span = document.createElement("span");

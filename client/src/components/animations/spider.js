@@ -5,11 +5,11 @@ let spiderStarted = false;
 let spiderCanvas = null;
 
 export function initSpider() {
+  if (spiderStarted) return;
+  
   spiderCanvas = document.getElementById('spider-canvas');
   if (!spiderCanvas) return;
   spiderCanvas.style.opacity = '1';
-
-  if (spiderStarted) return;
   spiderStarted = true;
 
   // Redirect canvas selection to #spider-canvas

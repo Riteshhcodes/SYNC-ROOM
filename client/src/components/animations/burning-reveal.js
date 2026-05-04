@@ -7,10 +7,15 @@ let glInstance = null;
 let rafId = null;
 let startTimestamp = null;
 
-const textCanvas = document.createElement("canvas");
-const textCtx = textCanvas.getContext("2d");
+let textCanvas = null;
+let textCtx = null;
 
 function createTextTexture(gl) {
+  if (!textCanvas) {
+    textCanvas = document.createElement("canvas");
+    textCtx = textCanvas.getContext("2d");
+  }
+  
   textCanvas.width = 2048;
   textCanvas.height = 1024;
   textCtx.fillStyle = "white";
