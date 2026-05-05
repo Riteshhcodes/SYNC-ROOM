@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function NeuralBackground() {
+export default function NeuralBackground({ children }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -22,9 +22,11 @@ export default function NeuralBackground() {
 
   return (
     <div ref={containerRef} style={{ position: 'relative', overflow: 'visible', width: '100%', height: '100vh' }}>
+      {/* Neural network iframe as background */}
+      
       {/* Your hero content on top */}
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <h1>Sync Room</h1>
+      <div style={{ position: 'relative', zIndex: 20 }}>
+        {children}
       </div>
     </div>
   );
