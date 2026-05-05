@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Spider</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+        #spider-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="spider-canvas"></canvas>
+    
+    <script>
+        // Simple spider animation
+        const canvas = document.getElementById('spider-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let spider = {
+            x: 100,
+            y: 100,
+            vx: 1,
+            vy: 0.5,
+            angle: 0,
+            legPhase: 0
+        };
+        let webPoints = [];
+        let animationId;
+        
+        function resize() {
+            width = canvas.width = 400;
+            height = canvas.height = 400;
+        }
+        
+        function drawSpider(x, y, angle, legPhase) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            
+            // Body
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 15, 10, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
+            ctx.fill();
+            
+            // Head
+            ctx.beginPath();
+            ctx.ellipse(12, 0, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Legs
+            ctx.strokeStyle = 'rgba(50, 50, 50, 0.6)';
+            ctx.lineWidth = 2;
+            
+            for (let i = 0; i < 8; i++) {
+                const legAngle = (i / 8) * Math.PI * 2;
+                const legLength = 20 + Math.sin(legPhase + i) * 5;
+                const midX = Math.cos(legAngle) * legLength * 0.6;
+                const midY = Math.sin(legAngle) * legLength * 0.6;
+                const endX = Math.cos(legAngle) * legLength;
+                const endY = Math.sin(legAngle) * legLength;
+                
+                ctx.beginPath();
+                ctx.moveTo(i < 4 ? -5 : 5, i < 4 ? -5 : 5);
+                ctx.quadraticCurveTo(midX, midY, endX, endY);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawWeb() {
+            ctx.strokeStyle = 'rgba(200, 200, 200, 0.3)';
+            ctx.lineWidth = 1;
+            
+            webPoints.forEach((point, i) => {
+                // Draw radial lines
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y);
+                for (let j = i + 1; j < webPoints.length; j++) {
+                    const dist = Math.hypot(webPoints[j].x - point.x, webPoints[j].y - point.y);
+                    if (dist < 100) {
+                        ctx.lineTo(webPoints[j].x, webPoints[j].y);
+                    }
+                }
+                ctx.stroke();
+            });
+        }
+        
+        function updateSpider() {
+            // Update position
+            spider.x += spider.vx;
+            spider.y += spider.vy;
+            
+            // Bounce off walls
+            if (spider.x < 20 || spider.x > width - 20) {
+                spider.vx *= -1;
+                spider.angle = Math.atan2(spider.vy, spider.vx);
+            }
+            if (spider.y < 20 || spider.y > height - 20) {
+                spider.vy *= -1;
+                spider.angle = Math.atan2(spider.vy, spider.vx);
+            }
+            
+            // Add web point occasionally
+            if (Math.random() < 0.02 && webPoints.length < 20) {
+                webPoints.push({ x: spider.x, y: spider.y });
+            }
+            
+            // Remove old web points
+            if (webPoints.length > 20) {
+                webPoints.shift();
+            }
+            
+            // Update leg animation
+            spider.legPhase += 0.1;
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            drawWeb();
+            updateSpider();
+            drawSpider(spider.x, spider.y, spider.angle, spider.legPhase);
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', resize);
+        
+        resize();
+        animate();
+    </script>
+</body>
+</html>

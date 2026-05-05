@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Network Background</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .panel {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            font-size: 12px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="panel" style="top: 20px; left: 20px;">
+        <div>Active Nodes: <span id="active-nodes">0</span></div>
+        <div>Connections: <span id="connections">0</span></div>
+    </div>
+    <div class="panel" style="top: 20px; right: 20px;">
+        <div>Network Status: <span id="status">Active</span></div>
+        <div>Data Flow: <span id="flow">Normal</span></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Simple neural network visualization
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let nodes = [];
+        let connections = [];
+        let animationId;
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        
+        class Node {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 3 + 2;
+                this.active = Math.random() > 0.5;
+                this.pulse = 0;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+                
+                this.pulse += 0.05;
+                this.active = Math.sin(this.pulse) > 0;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.active ? 'rgba(76, 217, 176, 0.8)' : 'rgba(76, 217, 176, 0.3)';
+                ctx.fill();
+                
+                if (this.active) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(76, 217, 176, 0.1)';
+                    ctx.fill();
+                }
+            }
+        }
+        
+        class Connection {
+            constructor(node1, node2) {
+                this.node1 = node1;
+                this.node2 = node2;
+                this.strength = Math.random();
+            }
+            
+            draw() {
+                if (this.node1.active && this.node2.active) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.node1.x, this.node1.y);
+                    ctx.lineTo(this.node2.x, this.node2.y);
+                    ctx.strokeStyle = `rgba(76, 217, 176, ${this.strength * 0.5})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        function init() {
+            resize();
+            
+            // Create nodes
+            for (let i = 0; i < 50; i++) {
+                nodes.push(new Node(
+                    Math.random() * width,
+                    Math.random() * height
+                ));
+            }
+            
+            // Create connections
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    if (Math.random() > 0.9) {
+                        connections.push(new Connection(nodes[i], nodes[j]));
+                    }
+                }
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Update and draw connections
+            connections.forEach(conn => conn.draw());
+            
+            // Update and draw nodes
+            nodes.forEach(node => {
+                node.update();
+                node.draw();
+            });
+            
+            // Update stats
+            const activeNodes = nodes.filter(n => n.active).length;
+            document.getElementById('active-nodes').textContent = activeNodes;
+            document.getElementById('connections').textContent = connections.length;
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', resize);
+        
+        init();
+        animate();
+    </script>
+</body>
+</html>
