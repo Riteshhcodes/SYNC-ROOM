@@ -13,7 +13,7 @@ export default function NeuralBackground() {
       width: 100%;
       height: 100%;
       border: none;
-      z-index: 0;
+      z-index: 1;
       pointer-events: none;
     `;
     containerRef.current?.appendChild(iframe);
@@ -21,9 +21,9 @@ export default function NeuralBackground() {
   }, []);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100vh' }}>
+    <div ref={containerRef} style={{ position: 'relative', overflow: 'visible', width: '100%', height: '100vh' }}>
       {/* Your hero content on top */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div style={{ position: 'relative', zIndex: 10 }}>
         <h1>Sync Room</h1>
       </div>
     </div>

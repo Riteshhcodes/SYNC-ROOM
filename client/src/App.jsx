@@ -21,7 +21,7 @@ export default function App() {
 
         {/* Hero section with Neural Network background */}
         <NeuralBackground>
-          <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'relative', zIndex: 20, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Toaster
               position="top-center"
               richColors
