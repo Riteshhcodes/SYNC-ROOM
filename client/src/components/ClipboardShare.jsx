@@ -32,10 +32,10 @@ export default function ClipboardShare({ roomId, onSend, messages }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-sm font-anime font-semibold text-text-secondary uppercase tracking-wider">
-        <span>📜</span>
-        <span>Kasugai Crow Messenger</span>
-      </div>
+      <h3 className="text-xs tracking-widest text-[#667eea] mb-3 flex items-center gap-2 uppercase">
+        <span>🕊️</span>
+        Kasugai Crow Messenger
+      </h3>
 
       {/* Input */}
       <div className="flex gap-2">
@@ -75,10 +75,10 @@ export default function ClipboardShare({ roomId, onSend, messages }) {
                 initial={{ opacity: 0, x: msg.direction === 'received' ? -20 : 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className={`flex items-start gap-2 p-2.5 rounded-lg text-sm font-japanese ${
+                className={`flex items-start gap-2 p-2.5 rounded-lg text-sm ${
                   msg.direction === 'received'
-                    ? 'bg-mint-subtle/30 border border-mint-primary/20 shadow-sm'
-                    : 'bg-white border border-glass-border shadow-sm'
+                    ? 'bg-[#00f5d4]/10 border border-[#00f5d4]/20'
+                    : 'bg-white/5 border border-white/10'
                 }`}
               >
                 <span className="flex-shrink-0 mt-0.5">

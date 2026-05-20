@@ -44,6 +44,11 @@ export const FILE_CATEGORIES = {
 export const ENCRYPTION_SALT = 'SYNC_ROOM_E2E_2024';
 
 // ─── Connection States ────────────────────────────────────
+export const ROOM_TYPES = {
+  DIRECT: 'direct',
+  GROUP: 'group',
+};
+
 export const CONNECTION_STATES = {
   WAITING: 'waiting',
   CONNECTING: 'connecting',

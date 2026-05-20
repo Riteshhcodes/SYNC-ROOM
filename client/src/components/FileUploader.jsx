@@ -82,9 +82,14 @@ export default function FileUploader({ onSendFiles, disabled }) {
   const handleSend = useCallback(async () => {
     if (selectedFiles.length === 0 || isSending) return;
 
+    const valid = selectedFiles.filter((f) => f.size > 0);
+    if (!valid.length) {
+      return;
+    }
+
     setIsSending(true);
     try {
-      await onSendFiles(selectedFiles);
+      await onSendFiles(valid);
       setSelectedFiles([]);
       setThumbnails({});
     } catch (err) {
@@ -133,8 +138,8 @@ export default function FileUploader({ onSendFiles, disabled }) {
         onClick={() => fileInputRef.current?.click()}
         animate={isDragOver ? { scale: 1.02 } : { scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className={`drop-zone p-8 text-center cursor-pointer transition-all duration-300 ${
-          isDragOver ? 'drag-over' : ''
+        className={`glass-panel border-2 border-dashed border-[#00f5d4]/30 hover:border-[#00f5d4]/70 p-12 text-center cursor-pointer transition-all duration-300 group ${
+          isDragOver ? 'drag-over !border-[#00f5d4]/70' : ''
         }`}
       >
         <input
@@ -161,18 +166,18 @@ export default function FileUploader({ onSendFiles, disabled }) {
             }
           >
             {isDragOver ? (
-              <span className="text-4xl drop-shadow-md">🌸</span>
+              <span className="text-5xl group-hover:scale-110 transition-transform">🌸</span>
             ) : (
-              <HiOutlineCloudUpload className="w-12 h-12 text-mint-primary opacity-60" />
+              <span className="text-5xl group-hover:scale-110 transition-transform">☁️</span>
             )}
           </motion.div>
 
           <div>
-            <p className="text-sm font-mono text-text-primary">
+            <p className="text-white/60">
               {isDragOver ? '✨ Drop files here ✨' : 'Tap to select files'}
             </p>
-            <p className="text-xs font-mono text-text-muted mt-1">
-              or drag & drop • Images, Videos, Docs, Text
+            <p className="text-xs text-white/30 mt-1">
+              Images, Videos, Docs, Text
             </p>
           </div>
         </motion.div>
@@ -250,7 +255,7 @@ export default function FileUploader({ onSendFiles, disabled }) {
                       animate="visible"
                       exit="exit"
                       layout
-                      className="flex items-center gap-3 px-3 py-2 bg-bg-elevated rounded-lg border border-glass-border group hover:border-mint-primary/30 transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 glass-panel !rounded-lg group hover:border-[#00f5d4]/30 transition-colors"
                     >
                       {/* Thumbnail or Icon */}
                       {thumb ? (

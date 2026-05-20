@@ -2,9 +2,6 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { io } from 'socket.io-client';
 import { SERVER_URL } from '../utils/constants';
 
-/**
- * Socket.io connection hook — singleton pattern.
- */
 let socketInstance = null;
 
 export function useSocket() {
@@ -25,40 +22,30 @@ export function useSocket() {
     socketRef.current = socketInstance;
     const socket = socketRef.current;
 
-    const onConnect = () => {
-      setIsConnected(true);
-    };
-
-    const onDisconnect = () => {
-      setIsConnected(false);
-    };
-
-    const onError = () => {
-      // Handled silently to avoid console clutter. UI will show offline.
-    };
+    const onConnect = () => setIsConnected(true);
+    const onDisconnect = () => setIsConnected(false);
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
-    socket.on('connect_error', onError);
 
-    // If already connected
-    if (socket.connected) {
-      setIsConnected(true);
-    }
+    if (socket.connected) setIsConnected(true);
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
-      socket.off('connect_error', onError);
     };
   }, []);
 
-  const createRoom = useCallback(() => {
+  const createRoom = useCallback((options = {}) => {
+    const roomType = options.roomType || 'direct';
     return new Promise((resolve, reject) => {
       if (!socketRef.current) return reject(new Error('Socket not connected'));
-      socketRef.current.emit('create-room', (response) => {
+      socketRef.current.emit('create-room', {
+        roomType,
+        nickname: options.nickname,
+      }, (response) => {
         if (response.success) {
-          resolve(response.roomId);
+          resolve({ roomId: response.roomId, roomType: response.roomType || roomType });
         } else {
           reject(new Error(response.error || 'Failed to create room'));
         }
@@ -66,12 +53,20 @@ export function useSocket() {
     });
   }, []);
 
-  const joinRoom = useCallback((roomId) => {
+  const joinRoom = useCallback((payload) => {
     return new Promise((resolve, reject) => {
       if (!socketRef.current) return reject(new Error('Socket not connected'));
-      socketRef.current.emit('join-room', roomId, (response) => {
+
+      const emitPayload = typeof payload === 'string'
+        ? payload
+        : payload;
+
+      socketRef.current.emit('join-room', emitPayload, (response) => {
         if (response.success) {
-          resolve(response.roomId);
+          resolve({
+            roomId: response.roomId,
+            roomType: response.roomType || 'direct',
+          });
         } else {
           reject(new Error(response.error || 'Failed to join room'));
         }
@@ -80,27 +75,23 @@ export function useSocket() {
   }, []);
 
   const sendSignal = useCallback((to, signal) => {
-    if (socketRef.current) {
-      socketRef.current.emit('signal', { to, signal });
-    }
+    socketRef.current?.emit('signal', { to, signal });
   }, []);
 
   const sendClipboard = useCallback((roomId, encryptedText) => {
-    if (socketRef.current) {
-      socketRef.current.emit('clipboard', { roomId, encryptedText });
-    }
+    socketRef.current?.emit('clipboard', { roomId, encryptedText });
   }, []);
 
   const on = useCallback((event, handler) => {
-    if (socketRef.current) {
-      socketRef.current.on(event, handler);
-    }
+    socketRef.current?.on(event, handler);
   }, []);
 
   const off = useCallback((event, handler) => {
-    if (socketRef.current) {
-      socketRef.current.off(event, handler);
-    }
+    socketRef.current?.off(event, handler);
+  }, []);
+
+  const emit = useCallback((event, data) => {
+    socketRef.current?.emit(event, data);
   }, []);
 
   return {
@@ -112,6 +103,7 @@ export function useSocket() {
     sendClipboard,
     on,
     off,
+    emit,
     socketId: socketRef.current?.id,
   };
 }
